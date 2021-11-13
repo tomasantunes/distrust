@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distrust</title>
+    <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+    <div class="logo">
+        <img src="images/logo/logo(transparent).png">
+    </div>
+	
+    <img class="preload" src="img/cards.png"/>
+
+    <div id="card-table">
+        <button id="start">START</button>
+        <div id="distrust-label">DISTRUST</div>
+        <div id="you-win-label">YOU WIN</div>
+        <div id="you-lose-label">YOU LOSE</div>
+    </div>
+
+    <div id="info">
+        <div id="player-announce">
+            <h3>Player</h3>
+            <p id="player-amount"></p>
+            <select id="player-announce-card">
+                <option value="1">Ace</option>
+                <option value="2">Two</option>
+                <option value="3">Three</option>
+                <option value="4">Four</option>
+                <option value="5">Five</option>
+                <option value="6">Six</option>
+                <option value="7">Seven</option>
+                <option value="8">Eight</option>
+                <option value="9">Nine</option>
+                <option value="10">Ten</option>
+                <option value="11">Jack</option>
+                <option value="12">Queen</option>
+                <option value="13">King</option>
+            </select>
+            <div>
+                <button id="player-play">Play</button>
+            </div>
+            <div>
+                <button id="player-distrust">Distrust</button>
+            </div>
+        </div>
+        <div id="computer-announce">
+            <h3>Computer</h3>
+            <p id="computer-amount"></p>
+            <p id="computer-announce-card"></p>
+        </div>
+    </div>
+
+    <div id="right-panel">
+        <h3>Log</h3>
+        <div id="log">
+
+        </div>
+        <button id="restart-btn">Restart</button>
+
+        <div id="instructions">
+            <h3>Game Instructions</h3>
+            <p>The deck is divided among the two players.</p>
+            <p>The goal is to get rid of all your cards.</p>
+            <p>You can discard one or more cards of the same rank.</p>
+            <p>You have to announce which card you're discarding.</p>
+            <p>You can discard other cards to reach your goal faster.</p>
+            <p>The other player has a chance to distrust your move.</p>
+            <p>If the card is correct, the distruster draws all the cards from the discard pile.</p>
+            <p>If the card is incorrect the player draws all the cards.</p>
+        </div>
+    </div>
+
+    <div class="clearfix"></div>
+
+    <script src="jquery-1.7.min.js"></script>
+    <script src="deckType.js"></script>
+	<script src="cards.js"></script>
+    <script>
+
+        function isInArray(value, array) {
+            return array.indexOf(value) > -1;
+        }
+
+        function randomInt(min, max) {
+            if (min==null && max==null)
+                return 0;    
+            
+            if (max == null) {
+                max = min;
+                min = 0;
+            }
+            return min + Math.floor(Math.random() * (max - min + 1));
+        };
+
+        function shuffle(a) {
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        
+        function mostFrequent(arr){
+            var map = {};
+            var mostFrequentElement = arr[0];
+            for(var i = 0; i < arr.length; i++){
+                if (!map[arr[i]]){
+                    map[arr[i]] = 1;
+                }
+                else {
+                    ++map[arr[i]];
+                    if(map[arr[i]] > map[mostFrequentElement]){
+                        mostFrequentElement = arr[i];
+                    }
+                }
+            }
+            return mostFrequentElement;
+        }
+
+        var deck, upperhand, lowerhand, discardPile;
+
+        cards.init({table:'#card-table', type:STANDARD});
+
+        function checkPlayerWins() {
+            if (lowerhand.length < 1) {
+                $("#you-win-label").show();
+                $("#log").append(
+                    "<p>" +
+                        "Player has won the game." +
+                    "</p>"
+                )
+                .ready(function() {
+                    $("#log").animate({scrollTop: $("#log")[0].scrollHeight}, 1000);
+                });
+                return true;
+            }
+            return false;
+        }
+
+        function checkComputerWins() {
+            if (upperhand.length < 1) {
+                $("#you-lose-label").show();
+                $("#log").append(
+                    "<p>" +
+                        "Computer has won the game." +
+                    "</p>"
+                )
+                .ready(function() {
+                    $("#log").animate({scrollTop: $("#log")[0].scrollHeight}, 1000);
+                });
+                return true;
+            }
+            return false;
+        }
+
+        function init() {
+            deck = new cards.Deck();
+            deck.x -= 50;
+
+            deck.addCards(cards.all);
+
+            deck.render({immediate:true});
+
+            upperhand = new cards.Hand({faceUp:false, y:60});
+            lowerhand = new cards.Hand({faceUp:true,  y:340});
+
+            //Lets add a discard pile
+            discardPile = new cards.Deck({faceUp:false});
+
+            $('#start').show();
+
+            $("#you-win-label").hide();
+            $("#you-lose-label").hide();
+            $("#player-play").show();
+
+            $("#player-announce-card").val(1).change();
+            $("#player-amount").text(0 + "x");
+            $("#computer-announce-card").text("");
+            $("#computer-amount").text(0 + "x");
+            $('#start').off();
+            $("#player-play").off();
+            $("#player-distrust").off();
+
+            //Let's deal when the Deal button is pressed:
+            $('#start').click(function() {
+                //Deck has a built in method to deal to hands.
+                $('#start').hide();
+                deck.deal(26, [upperhand, lowerhand], 50, function() {
+                    //This is a callback function, called when the dealing
+                    //is done.
+                    lowerhand.sortCards();
+                    lowerhand.render();
+                    upperhand.sortCards();
+                    upperhand.render();
+                    discardPile.render();
+                });
+            });
+
+            var halfW = cards.options.cardSize.width / 2;
+            var halfH = cards.options.cardSize.height / 2;
+            var selectedCards = [];
+            var computerSelectedCards = [];
+
+            var ranksToCards = [
+                "Ace",
+                "Two",
+                "Three",
+                "Four",
+                "Five",
+                "Six",
+                "Seven",
+                "Eight",
+                "Nine",
+                "Ten",
+                "Jack",
+                "Queen",
+                "King"
+            ];
+
+            var computerData = {
+                "probabilityOfDistrust": 0.01,
+                "probabilityOfLie": 0.5,
+                "discardPile": [],
+            };
+
+            var playerDistrusts = false;
+
+            lowerhand.click(function(card){
+                if (selectedCards.length < 1) {
+                    card.moveTo(card.targetLeft + halfW, card.targetTop + halfH - 25);
+                    selectedCards.push(card);
+                    $("#player-announce-card").val(card.rank).change();
+                }
+                else if (isInArray(card, selectedCards)) {
+                    var index = selectedCards.indexOf(card);
+                    selectedCards.splice(index, 1);
+                    card.moveTo(card.targetLeft + halfW, card.targetTop + halfH);
+                }
+                else {
+                    card.moveTo(card.targetLeft + halfW, card.targetTop + halfH - 25);
+                    selectedCards.push(card);
+                }
+                $("#player-amount").text(selectedCards.length + "x");
+            });
+
+            $("#player-play").click(function() {
+                if (checkComputerWins()) {
+                    return;
+                }
+                $("#player-play").hide();
+                $("#player-distrust").hide();
+                discardPile.addCards(selectedCards);
+                discardPile.render();
+                lowerhand.render();
+
+                $("#log").append(
+                    "<p>" +
+                        "Player discarded " + selectedCards.length + " cards and announced " + ranksToCards[$("#player-announce-card").val() - 1] + "." +
+                    "</p>"
+                )
+                .ready(function() {
+                    $("#log").animate({scrollTop: $("#log")[0].scrollHeight}, 1000);
+                });
+
+                for (var i = 0; i < selectedCards.length; i++) {
+                    computerData["discardPile"].push($("#player-announce-card").val());
+                }
+
+                var discard = computerData["discardPile"].reduce(function (acc, curr) {
+                    return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
+                }, {});
+
+                for (var key in discard) {
+                    if (discard[key] > 4) {
+                        computerData["probabilityOfDistrust"] = 0.1;
+                    }
+                }
+
+                if (upperhand.length < lowerhand.length) {
+                    computerData["probabilityOfDistrust"] = 0.01;
+                }
+
+                var computerDistrusts = Math.random() < computerData["probabilityOfDistrust"];
+
+                if (lowerhand.length < 1) {
+                    computerDistrusts = true;
+                }
+
+                var cardIsCorrect = true;
+
+                for (var i = 0; i < selectedCards.length; i++) {
+                    var cardRank = selectedCards[i].rank;
+                    if (cardRank != $("#player-announce-card").val()) {
+                        cardIsCorrect = false;
+                    }
+                }
+
+                selectedCards = [];
+
+                if (computerDistrusts) {
+                    $("#distrust-label").show();
+                    setTimeout(function(){ 
+                        $("#distrust-label").hide();
+                        var discardPileLength = discardPile.length;
+                        if (computerDistrusts && cardIsCorrect) {
+                            while (discardPile.length > 0) {
+                                upperhand.addCard(discardPile.topCard());
+                            }
+                            discardPile.render();
+                            upperhand.sortCards();
+                            upperhand.render();
+                            if (checkPlayerWins()) {
+                                return;
+                            }
+                            $("#log").append(
+                                "<p>" +
+                                    "Computer distrusted, card was correct. Computer draws " + discardPileLength + " cards." +
+                                "</p>"
+                            ).ready(function() {
+                                $("#log").animate({scrollTop: $("#log")[0].scrollHeight}, 1000);
+                            });
+
+                            computerData["probabilityOfDistrust"] = 0.05;
+                        }
+                        else if (computerDistrusts && !cardIsCorrect) {
+                            while (discardPile.length > 0) {
+                                lowerhand.addCard(discardPile.topCard());
+                            }
+                            discardPile.render();
+                            lowerhand.sortCards();
+                            lowerhand.render();
+
+                            $("#log").append(
+                                "<p>" +
+                                    "Computer distrusted, card was incorrect. Player draws " + discardPileLength + " cards." +
+                                "</p>"
+                            ).ready(function() {
+                                $("#log").animate({scrollTop: $("#log")[0].scrollHeight}, 1000);
+                            });
+
+                            computerData["probabilityOfDistrust"] = 0.2;
+                        }
+                    }, 2000);
+                }
+                else {
+                    if (checkPlayerWins()) {
+                        return;
+                    }
+                    
+                }
+
+                if (checkPlayerWins()) {
+                    return;
+                }
+
+                setTimeout(function() {
+                    if (playerDistrusts == false) {
+                        computerData["probabilityOfLie"] = 0.5;
+                    }
+                    var computerLies = Math.random() < computerData["probabilityOfLie"];
+                    computerSelectedCards = [];
+                    var computerCardRank = 0;
+
+                    if (computerLies) {
+                        upperhandArr = [];
+                        for (var i = 0; i < upperhand.length; i++) {
+                            upperhandArr.push(upperhand[i].rank);
+                        }
+
+                        var upperhandOccurrences = upperhandArr.reduce(function (acc, curr) {
+                            return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
+                        }, {});
+
+                        var move = Object.keys(upperhandOccurrences).reduce(function(a, b){ return upperhandOccurrences[a] > upperhandOccurrences[b] ? a : b });
+
+                        var nCards = upperhandOccurrences[move];
+                        var upperhand2 = upperhand.slice();
+                        shuffle(upperhand2);
+                        
+                        for (var i = 0; i < nCards; i++) {
+                            computerSelectedCards.push(upperhand2[i]);
+                        }
+
+                        computerCardRank = move;
+                        $("#computer-announce-card").text(ranksToCards[computerCardRank - 1]);
+                        discardPile.addCards(computerSelectedCards);
+                        discardPile.render();
+                        upperhand.render();
+                    }
+                    else {
+                        var computerCards = [];
+                        for (var i = 0; i < upperhand.length; i++) {
+                            computerCards.push(upperhand[i].rank);
+                        }
+                        
+                        var mf = mostFrequent(computerCards);
+
+                        for (var i = 0; i < upperhand.length; i++) {
+                            if (upperhand[i].rank == mf) {
+                                computerSelectedCards.push(upperhand[i]);
+                            }
+                        }
+
+                        computerCardRank = mf;
+                        $("#computer-announce-card").text(ranksToCards[mf - 1]);
+                        discardPile.addCards(computerSelectedCards);
+                        discardPile.render();
+                        upperhand.render();
+                    }
+                    $("#computer-amount").text(computerSelectedCards.length + "x");
+                    $("#log").append(
+                        "<p>" +
+                            "Computer discarded " + computerSelectedCards.length + " cards and announced " + $("#computer-announce-card").text() + "." +
+                        "</p>"
+                    )
+                    .ready(function() {
+                        $("#log").animate({scrollTop: $("#log")[0].scrollHeight}, 1000);
+                    });
+
+                    for (var i = 0; i < computerSelectedCards.length; i++) {
+                        computerData["discardPile"].push(computerCardRank);
+                    }
+
+                    $("#player-play").show();
+                    $("#player-distrust").show();
+                }, 4000);            
+            });
+
+            $("#player-distrust").click(function() {
+                $("#player-distrust").hide();
+                playerDistrusts = true;
+                var computerCardIsCorrect = true;
+
+
+                for (var i = 0; i < computerSelectedCards.length; i++) {
+                    var cardRank = computerSelectedCards[i].rank;
+                    if (cardRank != ranksToCards.indexOf($("#computer-announce-card").text()) + 1) {
+                        computerCardIsCorrect = false;
+                    }
+                }
+
+                var discardPileLength = discardPile.length;
+                if (computerCardIsCorrect) {
+                    while (discardPile.length > 0) {
+                        lowerhand.addCard(discardPile.topCard());
+                    }
+                    discardPile.render();
+                    lowerhand.sortCards();
+                    lowerhand.render();
+                    if (checkComputerWins()) {
+                        return;
+                    }
+                    $("#log").append(
+                        "<p>" +
+                            "Player distrusted, card was correct. Player draws " + discardPileLength + " cards." +
+                        "</p>"
+                    )
+                    .ready(function() {
+                        $("#log").animate({scrollTop: $("#log")[0].scrollHeight}, 1000);
+                    });
+                }
+                else {
+                    while (discardPile.length > 0) {
+                        upperhand.addCard(discardPile.topCard());
+                    }
+                    discardPile.render();
+                    upperhand.sortCards();
+                    upperhand.render();
+
+                    $("#log").append(
+                        "<p>" +
+                            "Player distrusted, card was incorrect. Computer draws " + discardPileLength + " cards." +
+                        "</p>"
+                    )
+                    .ready(function() {
+                        $("#log").animate({scrollTop: $("#log")[0].scrollHeight}, 1000);
+                    });
+                }
+
+                computerData["probabilityOfLie"] = 0.1;
+            });
+        }
+        
+        init();
+
+
+        
+
+        $("#restart-btn").click(function() {
+            init();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+html { 
+	background-color:#092E20; 
+}
+
+body { 
+	position:relative;
+	border-radius:8px; 
+	box-shadow:black 0px 0px 2px; 
+	width: 600px; 
+	background:#FFF; 
+	margin:20px auto; 
+	border:solid 1px black; 
+	font-family: arial, sans-serif; 
+	padding:50px;  
+}
+#buttons {
+	text-align:center;
+}
+
+a img {
+	position: absolute; 
+	top: 0; 
+	right: 0; 
+	border: 0;			
+}
+button {
+	height:30px;
+	width:100px;
+	margin:8px auto;
+}
+img.preload {
+	display:none;
+}
+h1 {
+	font-size:60px;
+	text-align:center;
+	padding:0px;
+	margin:10px auto;
+}
+
+#card-table {
+	background-color:green;
+	height:400px;
+	width:600px;
+	border:solid 6px brown;
+	border-radius:8px;
+	-webkit-border-radius:8px;
+	-moz-border-radius:8px;
+	-ms-border-radius:8px;
+	-o-border-radius:8px;
+	box-shadow:#111 1px 1px 2px;
+}
+a:visited {color:blue;}
+
+#start {
+	position: absolute;
+	left:310px;
+	top:170px;
+}
+
+#distrust-label {
+	display: none;
+	position: absolute;
+	width: 200px;
+	height: 50px;
+	left: 165px;
+	top: 150px;
+	padding: 25px;
+	z-index: 10000;
+	background-color: #990000;
+	color: black;
+	border: 5px solid #330000;
+	font-weight: bold;
+	text-align: center;
+	font-size: 32px;
+}
+
+#you-win-label {
+	display: none;
+	position: absolute;
+	width: 200px;
+	height: 50px;
+	left: 165px;
+	top: 150px;
+	padding: 25px;
+	z-index: 10000;
+	background-color: #009933;
+	color: black;
+	border: 5px solid #034208;
+	font-weight: bold;
+	text-align: center;
+	font-size: 32px;
+}
+
+#you-lose-label {
+	display: none;
+	position: absolute;
+	width: 200px;
+	height: 50px;
+	left: 165px;
+	top: 150px;
+	padding: 25px;
+	z-index: 10000;
+	background-color: #990000;
+	color: black;
+	border: 5px solid #330000;
+	font-weight: bold;
+	text-align: center;
+	font-size: 32px;
+}
+
+#player-play {
+	outline: 0;
+	border: none;
+	background-color: #009933;
+	color: white;
+}
+
+#player-distrust {
+	display: none;
+	outline: 0;
+	border: none;
+	background-color: #990000;
+	color: white;
+}
+
+footer {
+	font-size : 12px;
+	color:grey;
+	margin:10px;
+}
+
+footer a, footer a:visited{
+	color:grey;
+}
+
+footer a:hover {
+	color:black;
+}
+
+#info {
+	float: left;
+	width: 300px;
+	height: 600px;
+}
+
+#player-announce {
+	height: 200px;
+}
+
+#computer-announce {
+	height: 200px;
+}
+
+.clearfix {
+	width: 100%;
+	clear: both;
+}
+
+#right-panel {
+	float: right;
+	width: 300px;
+}
+
+#log {
+	background-color: #ccc;
+	width: 300px;
+	height: 200px;
+	overflow: auto;
+	text-align: left;
+	padding: 20px;
+	color: black;
+}
+
+#restart-btn {
+	outline: 0;
+	border: none;
+	background-color: #009933;
+	color: white;
+}
+
+.logo {
+	margin: 0 auto;
+	width: 400px;
+	height: 100px;
+}
+
+.logo img {
+	width: 100%;
+}
