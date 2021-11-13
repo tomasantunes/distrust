@@ -249,6 +249,9 @@
             });
 
             $("#player-play").click(function() {
+                if (selectedCards.length < 1) {
+                    return;
+                }
                 if (checkComputerWins()) {
                     return;
                 }
