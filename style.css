@@ -54,8 +54,15 @@ a:visited {color:blue;}
 
 #start {
 	position: absolute;
-	left:310px;
-	top:170px;
+	left: 310px;
+	top: 165px;
+	width: 150px;
+	height: 50px;
+	font-size: 24px;
+	border: none;
+	outline: 0;
+	background-color: #034208;
+	color: white;
 }
 
 #distrust-label {
@@ -92,6 +99,23 @@ a:visited {color:blue;}
 	font-size: 32px;
 }
 
+#your-turn-label {
+	display: none;
+	position: absolute;
+	width: 200px;
+	height: 50px;
+	left: 165px;
+	top: 150px;
+	padding: 25px;
+	z-index: 10000;
+	background-color: #009933;
+	color: black;
+	border: 5px solid #034208;
+	font-weight: bold;
+	text-align: center;
+	font-size: 32px;
+}
+
 #you-lose-label {
 	display: none;
 	position: absolute;
@@ -108,6 +132,8 @@ a:visited {color:blue;}
 	text-align: center;
 	font-size: 32px;
 }
+
+
 
 #player-play {
 	outline: 0;
