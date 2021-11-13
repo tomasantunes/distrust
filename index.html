@@ -436,10 +436,13 @@
 
                     $("#player-play").show();
                     $("#player-distrust").show();
-                    $("#your-turn-label").show();
                     setTimeout(function() {
-                        $("#your-turn-label").hide();
+                        $("#your-turn-label").show();
+                        setTimeout(function() {
+                            $("#your-turn-label").hide();
+                        }, 1000);
                     }, 1000);
+                    
                 }, 4000);            
             });
 
