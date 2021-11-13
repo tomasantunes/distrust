@@ -1,2 +1,2 @@
 # distrust
-A classic card made with Javascript
+A classic card game made with Javascript
