@@ -19,6 +19,7 @@
         <div id="distrust-label">DISTRUST</div>
         <div id="you-win-label">YOU WIN</div>
         <div id="you-lose-label">YOU LOSE</div>
+        <div id="your-turn-label">YOUR TURN</div>
     </div>
 
     <div id="info">
@@ -198,6 +199,10 @@
                     upperhand.sortCards();
                     upperhand.render();
                     discardPile.render();
+                    $("#your-turn-label").show();
+                    setTimeout(function() {
+                        $("#your-turn-label").hide();
+                    }, 1000);
                 });
             });
 
@@ -431,6 +436,10 @@
 
                     $("#player-play").show();
                     $("#player-distrust").show();
+                    $("#your-turn-label").show();
+                    setTimeout(function() {
+                        $("#your-turn-label").hide();
+                    }, 1000);
                 }, 4000);            
             });
 
